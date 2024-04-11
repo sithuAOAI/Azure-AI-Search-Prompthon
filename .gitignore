@@ -1,0 +1,44 @@
+
+# Ignore IDE and editor files
+.vscode/
+.idea/
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+
+# Ignore environment-specific files
+.env
+.env.local
+.env.*.local
+
+
+# Ignore sensitive or personal information
+config.js
+secrets.json
+
+# Ignore compiled binaries or executables
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Ignore image thumbnails
+*.thumb
+
+# Ignore backup files
+*.bak
+*.backup
+*.swp
+*.swo
+
+# Ignore macOS specific files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+venv/
