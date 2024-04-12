@@ -10,9 +10,21 @@ from azure.search.documents.indexes.models import (
     AzureOpenAIEmbeddingSkill,
     HnswAlgorithmConfiguration,
     HnswParameters,
+    VectorSearchAlgorithmMetric,
     SplitSkill
 )
-
+# from azure.search.documents.indexes.models import (
+#     SearchIndex,
+#     SearchField,
+#     SearchFieldDataType,
+#     VectorSearch,
+#     HnswAlgorithmConfiguration,
+#     HnswParameters,
+#     VectorSearchAlgorithmMetric,
+#     VectorSearchProfile,
+#     AzureOpenAIVectorizer,
+#     AzureOpenAIParameters
+# )
 
 # Required to use the preview SDK
 from azure.search.documents.indexes._generated.models import (
@@ -38,9 +50,8 @@ def create_search_index(index_name, azure_openai_endpoint, azure_openai_embeddin
                 name="chunk_id",
                 type=SearchFieldDataType.String,
                 key=True,
-                hidden=False,
-                filterable=True,
                 sortable=True,
+                filterable=True,
                 facetable=False,
                 searchable=True,
                 analyzer_name="keyword"
@@ -48,62 +59,63 @@ def create_search_index(index_name, azure_openai_endpoint, azure_openai_embeddin
             SearchField(
                 name="parent_id",
                 type=SearchFieldDataType.String,
-                hidden=False,
-                filterable=True,
                 sortable=True,
+                filterable=True,
                 facetable=False,
                 searchable=True
             ),
             SearchField(
                 name="chunk",
                 type=SearchFieldDataType.String,
-                hidden=False,
-                filterable=False,
                 sortable=False,
+                filterable=False,
                 facetable=False,
                 searchable=True
             ),
             SearchField(
                 name="title",
                 type=SearchFieldDataType.String,
-                hidden=False,
-                filterable=False,
                 sortable=False,
+                filterable=False,
                 facetable=False,
                 searchable=True
             ),
             SearchField(
                 name="vector",
                 type=SearchFieldDataType.Collection(SearchFieldDataType.Single),
-                hidden=False,
-                filterable=False,
-                sortable=False,
-                facetable=False,
-                searchable=True,
                 vector_search_dimensions=1536,
-                vector_search_profile="profile"
+                vector_search_profile_name="hnswProfile"
             )
         ],
         vector_search=VectorSearch(
             profiles=[
                 VectorSearchProfile(
-                    name="profile",
-                    algorithm="hnsw-algorithm",
-                    vectorizer="azure-openai-vectorizer"
+                    name="hnswProfile",
+                    algorithm_configuration_name="hnsw",
+                    vectorizer="azureOpenAIVectorizer"
                 )
             ],
             algorithms=[
-                HnswVectorSearchAlgorithmConfiguration(name="hnsw-algorithm")
+                HnswAlgorithmConfiguration(
+                    name="hnsw",
+                    parameters=HnswParameters(
+                        m=4,
+                        ef_construction=400,
+                        ef_search=500,
+                        metric=VectorSearchAlgorithmMetric.COSINE
+                    )
+                )
             ],
             vectorizers=[
                 AzureOpenAIVectorizer(
-                        name="azure-openai-vectorizer",
-                        azure_open_ai_parameters=AzureOpenAIParameters(
-                            resource_uri=azure_openai_endpoint,
-                            deployment_id=azure_openai_embedding_deployment_id,
-                            api_key=azure_openai_key # Optional if using RBAC authentication
-                        )
+                    name="azureOpenAIVectorizer",
+                    kind="azureOpenAI",
+                    azure_open_ai_parameters=AzureOpenAIParameters(
+                        resource_uri=azure_openai_endpoint,
+                        deployment_id=azure_openai_embedding_deployment_id,
+                        api_key=azure_openai_key
                     )
+                )
             ]
         )
     )
